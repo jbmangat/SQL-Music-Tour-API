@@ -20,10 +20,21 @@ stages.get("/", async (req, res) => {
 });
 
 // FIND A SPECIFIC STAGE
-stages.get("/:id", async (req, res) => {
+stages.get("/:name", async (req, res) => {
   try {
     const foundStage = await Stage.findOne({
-      where: { stage_id: req.params.id },
+      where: { name: req.params.name },
+      include: [
+        {
+          model: Event,
+          as: "event",
+            where: {
+              name: {
+                [Op.like]: `%${req.query.event ? req.query.event : ""}%`,
+              },
+            },
+        },
+      ],
     });
   } catch (error) {
     res.status(500).json(error);
